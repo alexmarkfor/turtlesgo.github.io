@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RGB Video Framer Pro - Native Resolution Locked</title>
+    <title>RGB Video Framer Pro - Bulletproof Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -58,12 +58,12 @@
             </div>
             <div>
                 <h1 class="font-bold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">RGB Video Framer <span class="text-xs uppercase px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 mono ml-1">PRO</span></h1>
-                <p class="text-xs text-slate-400">Native Video Resolution Framer Studio</p>
+                <p class="text-xs text-slate-400">Bulletproof Codec & Native Resolution Studio</p>
             </div>
         </div>
         <div class="flex items-center space-x-3">
             <span id="statusBadge" class="hidden items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span id="statusDot" class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                 <span id="statusText">Ready</span>
             </span>
         </div>
@@ -90,14 +90,14 @@
                 </div>
                 
                 <div id="dropZone" class="border-2 border-dashed border-border hover:border-indigo-500/50 transition-all rounded-xl p-6 text-center cursor-pointer bg-darker/50 group relative">
-                    <input type="file" id="videoUpload" accept="video/mp4" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10">
+                    <input type="file" id="videoUpload" accept="video/mp4,video/webm" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10">
                     <div class="w-12 h-12 rounded-xl bg-indigo-500/10 text-indigo-400 mx-auto flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                         </svg>
                     </div>
-                    <p class="text-sm font-medium text-slate-200 mb-1">Drop your .mp4 video here or <span class="text-indigo-400 underline">browse</span></p>
-                    <p class="text-xs text-slate-400">Canvas automatically matches exact source dimensions</p>
+                    <p class="text-sm font-medium text-slate-200 mb-1">Drop your MP4 video here or <span class="text-indigo-400 underline">browse</span></p>
+                    <p class="text-xs text-slate-400">Requires H.264 / AAC codec for full browser compatibility</p>
                     <div id="fileInfo" class="mt-3 hidden text-xs mono text-cyan-400 bg-cyan-500/10 py-1.5 px-3 rounded-lg border border-cyan-500/20 inline-block"></div>
                 </div>
             </div>
@@ -217,7 +217,7 @@
                             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         </div>
                         <p class="text-sm font-medium text-slate-300">No video loaded</p>
-                        <p class="text-xs text-slate-500 mt-1">Upload an .mp4 video to match native size</p>
+                        <p class="text-xs text-slate-500 mt-1">Upload a supported MP4 video to begin</p>
                     </div>
 
                     <video id="sourceVideo" class="hidden" preload="auto" playsinline muted crossorigin="anonymous"></video>
@@ -257,6 +257,7 @@
         const speedRange = document.getElementById('speedRange');
         const speedVal = document.getElementById('speedVal');
         const statusBadge = document.getElementById('statusBadge');
+        const statusDot = document.getElementById('statusDot');
         const statusText = document.getElementById('statusText');
         const videoMetaBar = document.getElementById('videoMetaBar');
         const videoDuration = document.getElementById('videoDuration');
@@ -270,6 +271,7 @@
         let isFramed = false;
         let currentPreset = 'hyper';
         let animStartTime = performance.now();
+        let isVideoReady = false;
 
         // Presets definitions
         const presets = {
@@ -295,11 +297,23 @@
             });
         });
 
+        // Robust Error Handler for Codec Failures
+        sourceVideo.onerror = () => {
+            console.error("Video decoding error or unsupported codec.");
+            alert("Error: Browser failed to decode this video. If your video is encoded in HEVC/H.265, please convert it to H.264/AAC MP4 format.");
+            statusText.textContent = 'Codec Error / Unsupported File';
+            statusDot.className = 'w-1.5 h-1.5 rounded-full bg-rose-400';
+            statusBadge.classList.remove('hidden', 'bg-emerald-500/10', 'text-emerald-400', 'border-emerald-500/20');
+            statusBadge.classList.add('flex', 'bg-rose-500/10', 'text-rose-400', 'border-rose-500/20');
+            videoUpload.value = '';
+        };
+
         // Handle Video Upload and Lock Native Dimensions
         videoUpload.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
+            isVideoReady = false;
             const fileURL = URL.createObjectURL(file);
             sourceVideo.src = fileURL;
             sourceVideo.load();
@@ -307,7 +321,16 @@
             fileInfo.textContent = `${file.name} (${(file.size / (1024*1024)).toFixed(1)} MB)`;
             fileInfo.classList.remove('hidden');
 
-            sourceVideo.onloadedmetadata = () => {
+            statusBadge.classList.remove('hidden');
+            statusBadge.classList.add('flex');
+            statusDot.className = 'w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse';
+            statusText.textContent = 'Loading video stream...';
+
+            const onMetadataLoaded = () => {
+                if (isVideoReady) return;
+                if (!sourceVideo.videoWidth || !sourceVideo.videoHeight) return;
+                isVideoReady = true;
+
                 const nativeWidth = sourceVideo.videoWidth;
                 const nativeHeight = sourceVideo.videoHeight;
 
@@ -315,7 +338,7 @@
                 previewCanvas.width = nativeWidth;
                 previewCanvas.height = nativeHeight;
 
-                // Dynamically adjust preview container aspect ratio to match source video exactly
+                // Dynamically adjust container aspect ratio to match native video layout
                 previewContainer.style.aspectRatio = `${nativeWidth} / ${nativeHeight}`;
                 
                 videoResolution.textContent = `Resolution: ${nativeWidth}x${nativeHeight} (Native)`;
@@ -327,10 +350,12 @@
                 addFrameBtn.disabled = false;
                 addFrameBtn.classList.remove('opacity-50', 'cursor-not-allowed');
                 
-                statusBadge.classList.remove('hidden');
-                statusBadge.classList.add('flex');
-                statusText.textContent = 'Video Loaded (Native Size Ready)';
+                statusDot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400';
+                statusText.textContent = 'Native Ready';
             };
+
+            sourceVideo.addEventListener('loadedmetadata', onMetadataLoaded, { once: true });
+            sourceVideo.addEventListener('canplay', onMetadataLoaded, { once: true });
         });
 
         // Apply Frame & Start Rendering Loop based on video pixels
@@ -345,7 +370,7 @@
             exportBtn.disabled = false;
             exportBtn.classList.remove('opacity-50', 'cursor-not-allowed');
 
-            statusText.textContent = 'RGB Frame Locked & Playing';
+            statusText.textContent = 'RGB Frame Active & Playing';
             
             sourceVideo.currentTime = 0;
             sourceVideo.play().catch(err => console.log("Autoplay notice:", err));
