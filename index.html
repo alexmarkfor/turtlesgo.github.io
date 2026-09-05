@@ -1,606 +1,538 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>High-Performance JS Agar.io Clone with Custom Skin & Color Effects</title>
+    <title>RGB Video Framer Pro - Native Resolution Locked</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darker: '#0a0a0f',
+                        card: '#12131c',
+                        border: '#1e2030'
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0f;
+            color: #f8fafc;
         }
-        body, html {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: #111;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #fff;
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
         }
-        canvas {
-            display: block;
-            background: #1a1a1a;
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
         }
-        #ui {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            pointer-events: none;
-            font-size: 18px;
-            font-weight: bold;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
-            z-index: 10;
+        ::-webkit-scrollbar-track {
+            background: #0a0a0f;
         }
-        #leaderboard {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 15px;
-            border-radius: 8px;
-            width: 180px;
-            pointer-events: none;
-            backdrop-filter: blur(4px);
-            z-index: 10;
+        ::-webkit-scrollbar-thumb {
+            background: #1e2030;
+            border-radius: 3px;
         }
-        #leaderboard h3 {
-            font-size: 14px;
-            margin-bottom: 8px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.2);
-            padding-bottom: 4px;
-        }
-        #leaderboard ol {
-            padding-left: 20px;
-            font-size: 13px;
-        }
-        #leaderboard li {
-            margin-bottom: 4px;
-        }
-        #start-screen {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(20, 20, 20, 0.95);
-            padding: 40px;
-            border-radius: 14px;
-            text-align: center;
-            z-index: 30;
-            border: 2px solid #2ed573;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-            width: 320px;
-        }
-        #start-screen h1 {
-            margin-bottom: 25px;
-            font-size: 24px;
-            color: #2ed573;
-        }
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
-            color: #aaa;
-        }
-        .form-group input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            background: #222;
-            border: 1px solid #444;
-            border-radius: 6px;
-            color: white;
-            font-size: 16px;
-            outline: none;
-        }
-        .form-group input[type="color"] {
-            width: 100%;
-            height: 40px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            background: none;
-        }
-        #start-screen button, #game-over button {
-            width: 100%;
-            background: #2ed573;
-            border: none;
-            color: white;
-            padding: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        #start-screen button:hover, #game-over button:hover {
-            background: #26af5f;
-        }
-        #game-over {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.85);
-            padding: 30px 40px;
-            border-radius: 12px;
-            text-align: center;
-            display: none;
-            z-index: 20;
-            border: 2px solid #ff4757;
-            width: 300px;
-        }
-        #game-over h1 {
-            color: #ff4757;
-            margin-bottom: 15px;
-        }
-        #game-over p {
-            margin-bottom: 20px;
-            font-size: 14px;
-            color: #ccc;
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
 
-    <div id="start-screen">
-        <h1>Agar.io Web Clone</h1>
-        <div class="form-group">
-            <label for="nameInput">Your Cell Name:</label>
-            <input type="text" id="nameInput" value="Player" maxlength="15">
+    <header class="border-b border-border bg-darker/80 backdrop-blur-md sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-pink-500 via-purple-500 to-cyan-400 p-0.5 flex items-center justify-center shadow-lg shadow-purple-500/20">
+                <div class="w-full h-full bg-darker rounded-[10px] flex items-center justify-center">
+                    <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">RGB Video Framer <span class="text-xs uppercase px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 mono ml-1">PRO</span></h1>
+                <p class="text-xs text-slate-400">Native Video Resolution Framer Studio</p>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="colorInput">Cell Aura Color Effect:</label>
-            <input type="color" id="colorInput" value="#2ed573">
+        <div class="flex items-center space-x-3">
+            <span id="statusBadge" class="hidden items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span id="statusText">Ready</span>
+            </span>
         </div>
-        <button onclick="startGame()">Start Game</button>
+    </header>
+
+    <div id="fileProtocolNotice" class="hidden bg-amber-500/10 border-b border-amber-500/20 px-6 py-2.5 text-xs text-amber-300 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            <span><strong>Notice:</strong> Local <code class="mono bg-amber-500/20 px-1 py-0.5 rounded">file://</code> paths restrict exports. Run <code class="mono bg-amber-500/20 px-1 py-0.5 rounded">python3 -m http.server</code> in your folder and open <code class="mono bg-amber-500/20 px-1 py-0.5 rounded">http://localhost:8000</code>.</span>
+        </div>
     </div>
 
-    <div id="ui">
-        Score: <span id="score">10</span><br>
-        Mass: <span id="mass">10</span>
-    </div>
+    <main class="flex-1 max-w-7xl w-full mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <div class="lg:col-span-5 space-y-6">
+            
+            <div class="bg-card border border-border rounded-2xl p-5 shadow-xl relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center text-xs mono">01</span>
+                        Source Video (.mp4)
+                    </h2>
+                </div>
+                
+                <div id="dropZone" class="border-2 border-dashed border-border hover:border-indigo-500/50 transition-all rounded-xl p-6 text-center cursor-pointer bg-darker/50 group relative">
+                    <input type="file" id="videoUpload" accept="video/mp4" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10">
+                    <div class="w-12 h-12 rounded-xl bg-indigo-500/10 text-indigo-400 mx-auto flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                    </div>
+                    <p class="text-sm font-medium text-slate-200 mb-1">Drop your .mp4 video here or <span class="text-indigo-400 underline">browse</span></p>
+                    <p class="text-xs text-slate-400">Canvas automatically matches exact source dimensions</p>
+                    <div id="fileInfo" class="mt-3 hidden text-xs mono text-cyan-400 bg-cyan-500/10 py-1.5 px-3 rounded-lg border border-cyan-500/20 inline-block"></div>
+                </div>
+            </div>
 
-    <div id="leaderboard">
-        <h3>Leaderboard</h3>
-        <ol id="leaderboard-list"></ol>
-    </div>
+            <div class="bg-card border border-border rounded-2xl p-5 shadow-xl relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-pink-500"></div>
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center text-xs mono">02</span>
+                        RGB Frame Studio
+                    </h2>
+                    <button id="addFrameBtn" disabled class="opacity-50 cursor-not-allowed px-3 py-1.5 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white text-xs font-semibold rounded-lg shadow-lg shadow-indigo-500/25 transition-all flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Apply Frame & Play
+                    </button>
+                </div>
 
-    <div id="game-over">
-        <h1>Eaten!</h1>
-        <p>Your cell was absorbed by a larger organism.</p>
-        <button onclick="restartGame()">Play Again</button>
-    </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-2">RGB Animation Presets</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5" id="presetContainer">
+                            <button data-preset="hyper" class="preset-btn active p-2.5 rounded-xl border border-indigo-500 bg-indigo-500/10 text-left transition-all">
+                                <div class="w-full h-2 rounded-full bg-gradient-to-r from-red-500 via-green-500 to-blue-500 mb-1.5"></div>
+                                <span class="text-xs font-semibold text-slate-200">Hyper Gaming</span>
+                            </button>
+                            <button data-preset="cyber" class="preset-btn p-2.5 rounded-xl border border-border hover:border-slate-700 bg-darker/50 text-left transition-all">
+                                <div class="w-full h-2 rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-400 mb-1.5"></div>
+                                <span class="text-xs font-semibold text-slate-300">Cyber Neon</span>
+                            </button>
+                            <button data-preset="matrix" class="preset-btn p-2.5 rounded-xl border border-border hover:border-slate-700 bg-darker/50 text-left transition-all">
+                                <div class="w-full h-2 rounded-full bg-gradient-to-r from-emerald-400 via-teal-500 to-green-600 mb-1.5"></div>
+                                <span class="text-xs font-semibold text-slate-300">Matrix Pulse</span>
+                            </button>
+                            <button data-preset="vapor" class="preset-btn p-2.5 rounded-xl border border-border hover:border-slate-700 bg-darker/50 text-left transition-all">
+                                <div class="w-full h-2 rounded-full bg-gradient-to-r from-purple-400 via-pink-500 to-amber-400 mb-1.5"></div>
+                                <span class="text-xs font-semibold text-slate-300">Vaporwave</span>
+                            </button>
+                            <button data-preset="electric" class="preset-btn p-2.5 rounded-xl border border-border hover:border-slate-700 bg-darker/50 text-left transition-all">
+                                <div class="w-full h-2 rounded-full bg-gradient-to-r from-blue-500 via-indigo-500 to-white mb-1.5"></div>
+                                <span class="text-xs font-semibold text-slate-300">Electric Blue</span>
+                            </button>
+                            <button data-preset="sunset" class="preset-btn p-2.5 rounded-xl border border-border hover:border-slate-700 bg-darker/50 text-left transition-all">
+                                <div class="w-full h-2 rounded-full bg-gradient-to-r from-orange-500 via-red-500 to-yellow-400 mb-1.5"></div>
+                                <span class="text-xs font-semibold text-slate-300">Solar Flare</span>
+                            </button>
+                        </div>
+                    </div>
 
-    <canvas id="gameCanvas"></canvas>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">Frame Subtext (+)</label>
+                            <input type="text" id="subtextInput" value="+ 4K_RGB_FEED" class="w-full bg-darker border border-border rounded-xl px-3 py-2 text-sm text-slate-200 mono focus:outline-none focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">Border Width (<span id="borderWidthVal">8</span>px)</label>
+                            <input type="range" id="borderWidthRange" min="4" max="24" value="8" class="w-full accent-indigo-500 mt-2.5">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">Glow Intensity (<span id="glowVal">15</span>px)</label>
+                            <input type="range" id="glowRange" min="0" max="40" value="15" class="w-full accent-indigo-500 mt-2.5">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">Animation Speed (<span id="speedVal">2</span>x)</label>
+                            <input type="range" id="speedRange" min="0.5" max="5" step="0.5" value="2" class="w-full accent-indigo-500 mt-2.5">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-card border border-border rounded-2xl p-5 shadow-xl relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 to-emerald-400"></div>
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center text-xs mono">03</span>
+                        Export Framed Video
+                    </h2>
+                </div>
+                <button id="exportBtn" disabled class="w-full opacity-50 cursor-not-allowed py-3 px-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold rounded-xl shadow-lg shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Export & Download Video (.webm)
+                </button>
+                <div id="exportProgressContainer" class="hidden mt-4 space-y-2">
+                    <div class="flex justify-between text-xs mono text-slate-400">
+                        <span id="exportStatusLabel">Rendering Video...</span>
+                        <span id="exportPercent">0%</span>
+                    </div>
+                    <div class="w-full bg-darker rounded-full h-2 overflow-hidden border border-border">
+                        <div id="exportProgressBar" class="bg-gradient-to-r from-emerald-400 to-cyan-400 h-full w-0 transition-all duration-150"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="lg:col-span-7 space-y-6">
+            <div class="bg-card border border-border rounded-2xl p-5 shadow-xl relative overflow-hidden flex flex-col items-center">
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 via-indigo-500 to-pink-500"></div>
+                
+                <div class="w-full flex items-center justify-between mb-4">
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        Live RGB Preview (Native Aspect Ratio)
+                    </h2>
+                    <div class="flex items-center space-x-2" id="playbackControls">
+                        <button id="playPauseBtn" disabled class="opacity-50 p-2 rounded-xl bg-darker border border-border hover:border-indigo-500 text-slate-200 transition-all flex items-center justify-center">
+                            <svg id="playIcon" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="previewContainer" class="relative w-full aspect-video bg-darker rounded-xl border border-border overflow-hidden flex items-center justify-center group shadow-2xl">
+                    <div id="placeholderView" class="text-center p-6">
+                        <div class="w-16 h-16 rounded-2xl bg-indigo-500/10 text-indigo-400 mx-auto flex items-center justify-center mb-3 border border-indigo-500/20">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <p class="text-sm font-medium text-slate-300">No video loaded</p>
+                        <p class="text-xs text-slate-500 mt-1">Upload an .mp4 video to match native size</p>
+                    </div>
+
+                    <video id="sourceVideo" class="hidden" preload="auto" playsinline muted crossorigin="anonymous"></video>
+
+                    <canvas id="previewCanvas" class="w-full h-full object-contain hidden"></canvas>
+                </div>
+
+                <div id="videoMetaBar" class="w-full mt-4 hidden flex items-center justify-between text-xs mono text-slate-400 bg-darker px-4 py-2.5 rounded-xl border border-border">
+                    <span id="videoDuration">Duration: 00:00</span>
+                    <span id="videoResolution">Resolution: 1280x720</span>
+                </div>
+            </div>
+        </div>
+
+    </main>
 
     <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-
-        // Resize canvas to full window
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+        if (window.location.protocol === 'file:') {
+            document.getElementById('fileProtocolNotice').classList.remove('hidden');
         }
-        window.addEventListener('resize', resize);
-        resize();
 
-        // World Configuration
-        const WORLD_WIDTH = 4000;
-        const WORLD_HEIGHT = 4000;
-        const CELL_GRID_SIZE = 150;
+        const videoUpload = document.getElementById('videoUpload');
+        const sourceVideo = document.getElementById('sourceVideo');
+        const previewCanvas = document.getElementById('previewCanvas');
+        const previewContainer = document.getElementById('previewContainer');
+        const placeholderView = document.getElementById('placeholderView');
+        const fileInfo = document.getElementById('fileInfo');
+        const addFrameBtn = document.getElementById('addFrameBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const playIcon = document.getElementById('playIcon');
+        const subtextInput = document.getElementById('subtextInput');
+        const borderWidthRange = document.getElementById('borderWidthRange');
+        const borderWidthVal = document.getElementById('borderWidthVal');
+        const glowRange = document.getElementById('glowRange');
+        const glowVal = document.getElementById('glowVal');
+        const speedRange = document.getElementById('speedRange');
+        const speedVal = document.getElementById('speedVal');
+        const statusBadge = document.getElementById('statusBadge');
+        const statusText = document.getElementById('statusText');
+        const videoMetaBar = document.getElementById('videoMetaBar');
+        const videoDuration = document.getElementById('videoDuration');
+        const videoResolution = document.getElementById('videoResolution');
+        const exportProgressContainer = document.getElementById('exportProgressContainer');
+        const exportProgressBar = document.getElementById('exportProgressBar');
+        const exportPercent = document.getElementById('exportPercent');
+        const exportStatusLabel = document.getElementById('exportStatusLabel');
 
-        // Robust Image Loading with Local File Security (CORS/file://) Fallback Handling
-        const ball = new Image();
-        let ballLoaded = false;
-        
-        ball.onload = () => {
-            ballLoaded = true;
+        let ctx = previewCanvas.getContext('2d', { alpha: false });
+        let isFramed = false;
+        let currentPreset = 'hyper';
+        let animStartTime = performance.now();
+
+        // Presets definitions
+        const presets = {
+            hyper:  ['#ff0055', '#00ff66', '#0066ff', '#ff0055'],
+            cyber:  ['#ff007f', '#7000ff', '#00f0ff', '#ff007f'],
+            matrix: ['#00ff66', '#00cca3', '#003311', '#00ff66'],
+            vapor:  ['#c084fc', '#ec4899', '#f59e0b', '#c084fc'],
+            electric:['#3b82f6', '#6366f1', '#ffffff', '#3b82f6'],
+            sunset: ['#f97316', '#ef4444', '#eab308', '#f97316']
         };
-        
-        ball.onerror = () => {
-            // Automatic built-in SVG fallback pattern if local file access is restricted by browser security
-            ball.src = "https://raw.githubusercontent.com/alexmarkfor/turtlesgo.github.io/refs/heads/main/ball.png";
-        };
-        
-        ball.src = "ball.png";
 
-        // High-Performance Spatial Hash Grid for Broad-Phase Collision
-        class SpatialHashGrid {
-            constructor(width, height, cellSize) {
-                this.width = width;
-                this.height = height;
-                this.cellSize = cellSize;
-                this.cols = Math.ceil(width / cellSize);
-                this.rows = Math.ceil(height / cellSize);
-                this.grid = new Map();
-            }
+        borderWidthRange.addEventListener('input', (e) => borderWidthVal.textContent = e.target.value);
+        glowRange.addEventListener('input', (e) => glowVal.textContent = e.target.value);
+        speedRange.addEventListener('input', (e) => speedVal.textContent = e.target.value);
 
-            clear() {
-                this.grid.clear();
-            }
-
-            insert(entity) {
-                let r = entity.radius;
-                let startCol = Math.max(0, Math.floor((entity.x - r) / this.cellSize));
-                let endCol = Math.min(this.cols - 1, Math.floor((entity.x + r) / this.cellSize));
-                let startRow = Math.max(0, Math.floor((entity.y - r) / this.cellSize));
-                let endRow = Math.min(this.rows - 1, Math.floor((entity.y + r) / this.cellSize));
-
-                for (let c = startCol; c <= endCol; c++) {
-                    for (let ro = startRow; ro <= endRow; ro++) {
-                        let key = c + ',' + ro;
-                        if (!this.grid.has(key)) this.grid.set(key, []);
-                        this.grid.get(key).push(entity);
-                    }
-                }
-            }
-
-            retrieve(entity) {
-                let candidates = new Set();
-                let r = entity.radius;
-                let startCol = Math.max(0, Math.floor((entity.x - r) / this.cellSize));
-                let endCol = Math.min(this.cols - 1, Math.floor((entity.x + r) / this.cellSize));
-                let startRow = Math.max(0, Math.floor((entity.y - r) / this.cellSize));
-                let endRow = Math.min(this.rows - 1, Math.floor((entity.y + r) / this.cellSize));
-
-                for (let c = startCol; c <= endCol; c++) {
-                    for (let ro = startRow; ro <= endRow; ro++) {
-                        let key = c + ',' + ro;
-                        let cellEntities = this.grid.get(key);
-                        if (cellEntities) {
-                            for (let i = 0; i < cellEntities.length; i++) {
-                                candidates.add(cellEntities[i]);
-                            }
-                        }
-                    }
-                }
-                return candidates;
-            }
-        }
-
-        const spatialGrid = new SpatialHashGrid(WORLD_WIDTH, WORLD_HEIGHT, CELL_GRID_SIZE);
-
-        // Food Class
-        class Food {
-            constructor(x, y, color) {
-                this.x = x;
-                this.y = y;
-                this.radius = 5;
-                this.mass = 1;
-                this.color = color || `hsl(${Math.random() * 360}, 80%, 60%)`;
-            }
-
-            draw(camera) {
-                ctx.beginPath();
-                ctx.arc(this.x - camera.x, this.y - camera.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = this.color;
-                ctx.fill();
-            }
-        }
-
-        // Blob Class (Player & Bots) with Color Changer Effect Script
-        class Blob {
-            constructor(x, y, mass, color, name, isAI = false) {
-                this.x = x;
-                this.y = y;
-                this.mass = mass;
-                this.updateRadius();
-                this.color = color; // Base color / custom color effect
-                this.name = name;
-                this.isAI = isAI;
-                this.vx = 0;
-                this.vy = 0;
-                this.targetX = x;
-                this.targetY = y;
-                this.aiTimer = 0;
-            }
-
-            updateRadius() {
-                this.radius = Math.sqrt(this.mass) * 4;
-            }
-
-            update() {
-                this.updateRadius();
-                let speed = Math.max(1.2, 5 - (this.mass / 200));
-
-                if (this.isAI) {
-                    this.aiTimer--;
-                    if (this.aiTimer <= 0) {
-                        this.targetX = this.x + (Math.random() - 0.5) * 600;
-                        this.targetY = this.y + (Math.random() - 0.5) * 600;
-                        this.aiTimer = Math.floor(Math.random() * 60) + 30;
-                    }
-                } else {
-                    let dx = mouse.x - canvas.width / 2;
-                    let dy = mouse.y - canvas.height / 2;
-                    let dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist > 1) {
-                        this.targetX = this.x + dx * 5;
-                        this.targetY = this.y + dy * 5;
-                    }
-                }
-
-                let angle = Math.atan2(this.targetY - this.y, this.targetX - this.x);
-                let currentSpeed = this.isAI ? speed * 0.7 : speed;
-                
-                this.vx = Math.cos(angle) * currentSpeed;
-                this.vy = Math.sin(angle) * currentSpeed;
-
-                this.x += this.vx;
-                this.y += this.vy;
-
-                this.x = Math.max(this.radius, Math.min(WORLD_WIDTH - this.radius, this.x));
-                this.y = Math.max(this.radius, Math.min(WORLD_HEIGHT - this.radius, this.y));
-
-                if (this.mass > 200 && Math.random() < 0.05) {
-                    this.mass -= 0.1;
-                }
-            }
-
-            draw(camera) {
-                ctx.save();
-                ctx.beginPath();
-                ctx.arc(this.x - camera.x, this.y - camera.y, this.radius, 0, Math.PI * 2);
-                ctx.clip();
-
-                // 1. Draw the image texture ("ball.png" or fallback)
-                if (ballLoaded || (ball.complete && ball.naturalWidth > 0)) {
-                    ctx.drawImage(ball, this.x - camera.x - this.radius, this.y - camera.y - this.radius, this.radius * 2, this.radius * 2);
-                } else {
-                    // Procedural textured fill if image is still pending load
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fillRect(this.x - camera.x - this.radius, this.y - camera.y - this.radius, this.radius * 2, this.radius * 2);
-                }
-
-                // 2. Color Changer Script Effect: Dynamic Aura / Color Overlay on top of the image
-                let auraGradient = ctx.createRadialGradient(
-                    this.x - camera.x - this.radius * 0.25, 
-                    this.y - camera.y - this.radius * 0.25, 
-                    this.radius * 0.05, 
-                    this.x - camera.x, 
-                    this.y - camera.y, 
-                    this.radius
-                );
-                auraGradient.addColorStop(0, this.color + '33'); // Soft glow center
-                auraGradient.addColorStop(0.7, this.color + '77'); // Accent mid-tone
-                auraGradient.addColorStop(1, this.color + 'cc'); // Vibrant edge tint
-
-                ctx.fillStyle = auraGradient;
-                ctx.fillRect(this.x - camera.x - this.radius, this.y - camera.y - this.radius, this.radius * 2, this.radius * 2);
-
-                ctx.restore();
-
-                // Outer crisp border ring matching player/bot color
-                ctx.beginPath();
-                ctx.arc(this.x - camera.x, this.y - camera.y, this.radius, 0, Math.PI * 2);
-                ctx.lineWidth = Math.max(2, this.radius * 0.08);
-                ctx.strokeStyle = this.color;
-                ctx.stroke();
-
-                // Draw Name & Mass Text
-                ctx.fillStyle = '#ffffff';
-                ctx.font = `bold ${Math.max(12, Math.min(24, this.radius * 0.4))}px sans-serif`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(this.name, this.x - camera.x, this.y - camera.y - (this.radius > 20 ? 6 : 0));
-                
-                if (this.radius > 25) {
-                    ctx.font = `${Math.max(10, this.radius * 0.25)}px sans-serif`;
-                    ctx.fillText(Math.floor(this.mass), this.x - camera.x, this.y - camera.y + 12);
-                }
-            }
-        }
-
-        // Game State
-        let player = null;
-        let foods = [];
-        let bots = [];
-        let camera = { x: 0, y: 0 };
-        let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
-        let isGameOver = false;
-        let gameStarted = false;
-
-        const botNames = ['Apex', 'Blobby', 'Titan', 'Cosmo', 'Vortex', 'Pulse', 'Zeus', 'Shadow', 'Neo', 'Goliath'];
-
-        function startGame() {
-            let playerName = document.getElementById('nameInput').value.trim() || 'Player';
-            let playerColor = document.getElementById('colorInput').value;
-
-            document.getElementById('start-screen').style.display = 'none';
-
-            foods = [];
-            bots = [];
-
-            // Spawn Food
-            for (let i = 0; i < 600; i++) {
-                foods.push(new Food(Math.random() * WORLD_WIDTH, Math.random() * WORLD_HEIGHT));
-            }
-
-            // Spawn AI Bots with randomized distinct color effects
-            for (let i = 0; i < 25; i++) {
-                let bx = Math.random() * WORLD_WIDTH;
-                let by = Math.random() * WORLD_HEIGHT;
-                let bMass = Math.floor(Math.random() * 40) + 10;
-                let bColor = `hsl(${Math.random() * 360}, 80%, 55%)`;
-                let bName = botNames[Math.floor(Math.random() * botNames.length)] + Math.floor(Math.random() * 99);
-                bots.push(new Blob(bx, by, bMass, bColor, bName, true));
-            }
-
-            // Initialize Player with custom configured name and color effect
-            player = new Blob(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, 15, playerColor, playerName, false);
-            isGameOver = false;
-            gameStarted = true;
-        }
-
-        window.addEventListener('mousemove', (e) => {
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('border-indigo-500', 'bg-indigo-500/10'));
+                document.querySelectorAll('.preset-btn').forEach(b => b.classList.add('border-border', 'bg-darker/50'));
+                btn.classList.remove('border-border', 'bg-darker/50');
+                btn.classList.add('border-indigo-500', 'bg-indigo-500/10');
+                currentPreset = btn.dataset.preset;
+            });
         });
 
-        function restartGame() {
-            document.getElementById('game-over').style.display = 'none';
-            document.getElementById('start-screen').style.display = 'block';
-            gameStarted = false;
-        }
+        // Handle Video Upload and Lock Native Dimensions
+        videoUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
 
-        // Main Engine Update
-        function update() {
-            if (!gameStarted || isGameOver) return;
+            const fileURL = URL.createObjectURL(file);
+            sourceVideo.src = fileURL;
+            sourceVideo.load();
+            
+            fileInfo.textContent = `${file.name} (${(file.size / (1024*1024)).toFixed(1)} MB)`;
+            fileInfo.classList.remove('hidden');
 
-            player.update();
+            sourceVideo.onloadedmetadata = () => {
+                const nativeWidth = sourceVideo.videoWidth;
+                const nativeHeight = sourceVideo.videoHeight;
 
-            for (let i = 0; i < bots.length; i++) {
-                bots[i].update();
+                // STRICTLY lock canvas internal rendering size to exact video source size
+                previewCanvas.width = nativeWidth;
+                previewCanvas.height = nativeHeight;
+
+                // Dynamically adjust preview container aspect ratio to match source video exactly
+                previewContainer.style.aspectRatio = `${nativeWidth} / ${nativeHeight}`;
+                
+                videoResolution.textContent = `Resolution: ${nativeWidth}x${nativeHeight} (Native)`;
+                const mins = Math.floor(sourceVideo.duration / 60);
+                const secs = Math.floor(sourceVideo.duration % 60);
+                videoDuration.textContent = `Duration: ${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                videoMetaBar.classList.remove('hidden');
+
+                addFrameBtn.disabled = false;
+                addFrameBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                
+                statusBadge.classList.remove('hidden');
+                statusBadge.classList.add('flex');
+                statusText.textContent = 'Video Loaded (Native Size Ready)';
+            };
+        });
+
+        // Apply Frame & Start Rendering Loop based on video pixels
+        addFrameBtn.addEventListener('click', () => {
+            isFramed = true;
+            placeholderView.classList.add('hidden');
+            previewCanvas.classList.remove('hidden');
+
+            playPauseBtn.disabled = false;
+            playPauseBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+
+            exportBtn.disabled = false;
+            exportBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+
+            statusText.textContent = 'RGB Frame Locked & Playing';
+            
+            sourceVideo.currentTime = 0;
+            sourceVideo.play().catch(err => console.log("Autoplay notice:", err));
+
+            startAnimationLoop();
+        });
+
+        playPauseBtn.addEventListener('click', () => {
+            if (sourceVideo.paused) {
+                sourceVideo.play();
+                playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+                statusText.textContent = 'Playing...';
+            } else {
+                sourceVideo.pause();
+                playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+                statusText.textContent = 'Paused';
+            }
+        });
+
+        sourceVideo.addEventListener('ended', () => {
+            playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+            statusText.textContent = 'Finished';
+        });
+
+        // Render Frame strictly mapped to source video native canvas layout
+        function renderFrame() {
+            const w = previewCanvas.width;
+            const h = previewCanvas.height;
+            const borderWidth = parseInt(borderWidthRange.value);
+            const glowSize = parseInt(glowRange.value);
+            const speed = parseFloat(speedRange.value);
+            const subtext = subtextInput.value;
+
+            ctx.clearRect(0, 0, w, h);
+
+            // Draw video source perfectly fitted inside the native resolution buffer
+            if (sourceVideo.readyState >= 2) {
+                const innerW = w - (borderWidth * 2);
+                const innerH = h - (borderWidth * 2);
+                ctx.drawImage(sourceVideo, borderWidth, borderWidth, innerW, innerH);
             }
 
-            // Rebuild Spatial Hash Grid
-            spatialGrid.clear();
-            for (let i = 0; i < foods.length; i++) spatialGrid.insert(foods[i]);
-            for (let i = 0; i < bots.length; i++) spatialGrid.insert(bots[i]);
-            spatialGrid.insert(player);
+            // Animate RGB gradient frame based on native canvas dimensions
+            const time = (performance.now() - animStartTime) * 0.001 * speed;
+            const colors = presets[currentPreset];
+            
+            ctx.save();
+            const gradX = Math.cos(time) * w;
+            const gradY = Math.sin(time) * h;
+            const gradient = ctx.createLinearGradient(0, 0, gradX + w, gradY + h);
+            
+            colors.forEach((col, idx) => {
+                gradient.addColorStop(idx / (colors.length - 1), col);
+            });
 
-            // Player Collisions
-            let playerCandidates = spatialGrid.retrieve(player);
-            for (let entity of playerCandidates) {
-                let dx = player.x - entity.x;
-                let dy = player.y - entity.y;
-                let dist = Math.sqrt(dx * dx + dy * dy);
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = borderWidth;
+            if (glowSize > 0) {
+                ctx.shadowColor = colors[0];
+                ctx.shadowBlur = glowSize;
+            }
 
-                if (entity instanceof Food) {
-                    if (dist < player.radius + entity.radius) {
-                        player.mass += entity.mass;
-                        entity.x = Math.random() * WORLD_WIDTH;
-                        entity.y = Math.random() * WORLD_HEIGHT;
-                    }
-                } else if (entity instanceof Blob && entity !== player) {
-                    if (player.mass > entity.mass * 1.1 && dist < player.radius) {
-                        player.mass += entity.mass;
-                        entity.x = Math.random() * WORLD_WIDTH;
-                        entity.y = Math.random() * WORLD_HEIGHT;
-                        entity.mass = Math.floor(Math.random() * 30) + 10;
-                    } else if (entity.mass > player.mass * 1.1 && dist < entity.radius) {
-                        isGameOver = true;
-                        document.getElementById('game-over').style.display = 'block';
-                    }
+            // Draw the RGB frame borders tightly matched to native video dimensions
+            ctx.strokeRect(borderWidth / 2, borderWidth / 2, w - borderWidth, h - borderWidth);
+            ctx.restore();
+
+            // Draw subtext badge proportional to native video size
+            if (subtext.trim() !== '') {
+                ctx.save();
+                const fontSize = Math.max(14, Math.floor(w * 0.022));
+                ctx.font = `bold ${fontSize}px 'JetBrains Mono', monospace`;
+                ctx.fillStyle = '#ffffff';
+                ctx.shadowColor = colors[0];
+                ctx.shadowBlur = 8;
+                
+                const paddingX = borderWidth + 20;
+                const paddingY = borderWidth + 30;
+                
+                const textMetrics = ctx.measureText(subtext);
+                ctx.fillStyle = 'rgba(10, 10, 15, 0.85)';
+                ctx.fillRect(paddingX - 10, paddingY - (fontSize + 4), textMetrics.width + 20, fontSize + 12);
+                
+                ctx.strokeStyle = colors[1];
+                ctx.lineWidth = 1.5;
+                ctx.strokeRect(paddingX - 10, paddingY - (fontSize + 4), textMetrics.width + 20, fontSize + 12);
+
+                ctx.fillStyle = '#f8fafc';
+                ctx.fillText(subtext, paddingX, paddingY - 4);
+                ctx.restore();
+            }
+        }
+
+        function startAnimationLoop() {
+            if (!isFramed) return;
+            renderFrame();
+            requestAnimationFrame(startAnimationLoop);
+        }
+
+        // Export Function capturing native-resolution stream
+        exportBtn.addEventListener('click', async () => {
+            if (!isFramed) return;
+
+            exportBtn.disabled = true;
+            exportProgressContainer.classList.remove('hidden');
+            exportStatusLabel.textContent = 'Preparing native stream...';
+            exportProgressBar.style.width = '10%';
+            exportPercent.textContent = '10%';
+
+            sourceVideo.pause();
+            sourceVideo.currentTime = 0;
+            
+            await new Promise(resolve => setTimeout(resolve, 300));
+
+            const fps = 30;
+            let canvasStream;
+            try {
+                canvasStream = previewCanvas.captureStream(fps);
+            } catch (err) {
+                alert('Export blocked by browser security restrictions on file://. Please use python3 -m http.server');
+                exportBtn.disabled = false;
+                exportProgressContainer.classList.add('hidden');
+                return;
+            }
+
+            let mimeType = 'video/webm;codecs=vp9';
+            if (!MediaRecorder.isTypeSupported(mimeType)) {
+                mimeType = 'video/webm';
+            }
+
+            let mediaRecorder;
+            try {
+                mediaRecorder = new MediaRecorder(canvasStream, { mimeType, videoBitsPerSecond: 12000000 });
+            } catch (e) {
+                mediaRecorder = new MediaRecorder(canvasStream);
+            }
+
+            let chunks = [];
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data && e.data.size > 0) {
+                    chunks.push(e.data);
                 }
-            }
+            };
 
-            // Bot Collisions
-            for (let i = 0; i < bots.length; i++) {
-                let bot = bots[i];
-                let candidates = spatialGrid.retrieve(bot);
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(chunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `rgb_native_framed_${Date.now()}.webm`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
 
-                for (let entity of candidates) {
-                    let dx = bot.x - entity.x;
-                    let dy = bot.y - entity.y;
-                    let dist = Math.sqrt(dx * dx + dy * dy);
+                exportBtn.disabled = false;
+                exportProgressContainer.classList.add('hidden');
+                exportProgressBar.style.width = '0%';
+                exportPercent.textContent = '0%';
+                statusText.textContent = 'Native Export Complete!';
+            };
 
-                    if (entity instanceof Food) {
-                        if (dist < bot.radius + entity.radius) {
-                            bot.mass += entity.mass;
-                            entity.x = Math.random() * WORLD_WIDTH;
-                            entity.y = Math.random() * WORLD_HEIGHT;
-                        }
-                    } else if (entity instanceof Blob && entity !== bot) {
-                        if (bot.mass > entity.mass * 1.1 && dist < bot.radius) {
-                            bot.mass += entity.mass;
-                            if (entity === player) {
-                                isGameOver = true;
-                                document.getElementById('game-over').style.display = 'block';
-                            } else {
-                                entity.x = Math.random() * WORLD_WIDTH;
-                                entity.y = Math.random() * WORLD_HEIGHT;
-                                entity.mass = Math.floor(Math.random() * 30) + 10;
-                            }
-                        }
+            mediaRecorder.start();
+            sourceVideo.play();
+            playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+            exportStatusLabel.textContent = 'Rendering native resolution video...';
+
+            const duration = sourceVideo.duration;
+            const progressInterval = setInterval(() => {
+                if (sourceVideo.ended || sourceVideo.paused) {
+                    clearInterval(progressInterval);
+                    if (mediaRecorder.state === 'recording') {
+                        mediaRecorder.stop();
                     }
+                    return;
                 }
-            }
+                const progress = Math.min(95, Math.floor((sourceVideo.currentTime / duration) * 90));
+                exportProgressBar.style.width = `${progress}%`;
+                exportPercent.textContent = `${progress}%`;
+            }, 100);
 
-            // Smooth Camera Follow
-            let targetCamX = player.x - canvas.width / 2;
-            let targetCamY = player.y - canvas.height / 2;
-            camera.x += (targetCamX - camera.x) * 0.1;
-            camera.y += (targetCamY - camera.y) * 0.1;
-
-            // UI updates
-            document.getElementById('score').innerText = Math.floor(player.mass);
-            document.getElementById('mass').innerText = Math.floor(player.mass);
-
-            updateLeaderboard();
-        }
-
-        function updateLeaderboard() {
-            if (!player) return;
-            let allBlobs = [player, ...bots];
-            allBlobs.sort((a, b) => b.mass - a.mass);
-
-            let listHTML = '';
-            for (let i = 0; i < Math.min(5, allBlobs.length); i++) {
-                listHTML += `<li>${allBlobs[i].name}: ${Math.floor(allBlobs[i].mass)}</li>`;
-            }
-            document.getElementById('leaderboard-list').innerHTML = listHTML;
-        }
-
-        // Render Loop
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            if (!gameStarted) return;
-
-            // Background Grid Lines
-            ctx.strokeStyle = '#222';
-            ctx.lineWidth = 1;
-            let gridSize = 50;
-            let startX = - (camera.x % gridSize);
-            let startY = - (camera.y % gridSize);
-
-            ctx.beginPath();
-            for (let x = startX; x < canvas.width; x += gridSize) {
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, canvas.height);
-            }
-            for (let y = startY; y < canvas.height; y += gridSize) {
-                ctx.moveTo(0, y);
-                ctx.lineTo(canvas.width, y);
-            }
-            ctx.stroke();
-
-            // World Border bounds
-            ctx.strokeStyle = '#ff4757';
-            ctx.lineWidth = 4;
-            ctx.strokeRect(-camera.x, -camera.y, WORLD_WIDTH, WORLD_HEIGHT);
-
-            // Draw Foods
-            for (let i = 0; i < foods.length; i++) {
-                foods[i].draw(camera);
-            }
-
-            // Draw Bots
-            for (let i = 0; i < bots.length; i++) {
-                bots[i].draw(camera);
-            }
-
-            // Draw Player
-            if (player) {
-                player.draw(camera);
-            }
-        }
-
-        // Master Frame Loop
-        function loop() {
-            update();
-            draw();
-            requestAnimationFrame(loop);
-        }
-
-        loop();
+            sourceVideo.onended = () => {
+                clearInterval(progressInterval);
+                if (mediaRecorder.state === 'recording') {
+                    mediaRecorder.stop();
+                }
+                playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+            };
+        });
     </script>
 </body>
 </html>
